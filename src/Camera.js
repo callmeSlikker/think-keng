@@ -1,41 +1,105 @@
 import React, { useState } from "react";
 import Camera from "react-html5-camera-photo";
 import "react-html5-camera-photo/build/css/index.css";
-import { FilePond, registerPlugin } from "react-filepond";
+import { registerPlugin } from "react-filepond";
 import "filepond/dist/filepond.min.css";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
-import useImageStore from "./useImageStore";
-import { useNavigate } from "react-router-dom";
 import { CiImageOn } from "react-icons/ci";
+import useAiModel from "./useAiModel";
+import LoadingScreen from "./component/LoadingScreen";
 
 // Register the FilePond plugins (optional)
 registerPlugin(FilePondPluginImagePreview);
 
 const CameraAndFilePicker = () => {
-  const { imageData, setImageData } = useImageStore(); // ดึง imageData และ setImageData จาก zustand store
-  const navigate = useNavigate();
+  const { model } = useAiModel();
+  const [predictResult, setPredictResult] = useState(null);
+  const [imageSelected, setImageSelected] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleTakePhoto = (dataUri) => {
-    setImageData(dataUri); // อัปเดต imageData ใน zustand store
-    navigate("/blueBin");
+  const details = {
+    general: {
+      imageUrl: "/bin/1.1.png",
+      title: "general",
+      description: "general",
+    },
+    foodwaste: {
+      imageUrl: "/bin/2.1.png",
+      title: "foodwaste",
+      description: "foodwaste",
+    },
+    recycle: {
+      imageUrl: "/bin/3.1.png",
+      title: "recycle",
+      description: "recycle",
+    },
+    hazardous: {
+      imageUrl: "/bin/4.1.png",
+      title: "hazardous",
+      description: "hazardous",
+    },
+  };
+
+  const predictImage = (dataUri) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = dataUri;
+
+      // Wait for the image to load before passing it to the model
+      img.onload = async () => {
+        try {
+          setLoading(true); // Show loading screen
+          const prediction = await model.predict(img);
+
+          // Get the highest probability prediction
+          const highestPrediction = prediction.reduce((prev, current) => {
+            return current.probability > prev.probability ? current : prev;
+          });
+
+          setLoading(false); // Hide loading screen
+          resolve(highestPrediction); // Resolve with the prediction
+        } catch (error) {
+          setLoading(false); // Hide loading screen on error
+          reject(error); // Reject the promise on error
+        }
+      };
+
+      img.onerror = (error) => {
+        console.error("Error loading image", error);
+        setLoading(false); // Hide loading screen on error
+        reject(error); // Reject the promise if image loading fails
+      };
+    });
+  };
+
+  const handleTakePhoto = async (dataUri) => {
+    try {
+      const prediction = await predictImage(dataUri);
+      setPredictResult(details[prediction.className]);
+      setImageSelected(dataUri);
+    } catch (error) {
+      console.error("Prediction failed:", error);
+    }
   };
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         const imageUri = e.target.result; // นี่คือ Data URI ของรูปภาพ
-        setImageData(imageUri); // บันทึก Data URI ลงใน state
+        const prediction = await predictImage(imageUri);
+        setPredictResult(details[prediction.className]);
+        setImageSelected(imageUri);
       };
       reader.readAsDataURL(file); // อ่านไฟล์เป็น Data URI
-      navigate("/blueBin");
     }
   };
 
   return (
-    <div>
+    <>
+      {loading && <LoadingScreen />}
       <div>
         <Camera
           onTakePhoto={(dataUri) => handleTakePhoto(dataUri)} // เมื่อถ่ายภาพจะส่ง URI
@@ -46,18 +110,13 @@ const CameraAndFilePicker = () => {
         style={{
           display: "flex",
           alignItems: "center",
-          cursor: "pointer",
           justifyContent: "center",
         }}
       >
-        <label
-          htmlFor="file-upload"
-          style={{
-            width: "fit-content",
-          }}
-        >
-          <CiImageOn 
-          style={{fontSize: "64px",}}/>
+        <div style={{ textAlign: "center" }}>
+          <label htmlFor="file-upload" style={{ cursor: "pointer" }}>
+            <CiImageOn style={{ fontSize: "64px" }} />
+          </label>
           <input
             id="file-upload"
             type="file"
@@ -65,10 +124,36 @@ const CameraAndFilePicker = () => {
             style={{ display: "none" }}
             onChange={handleFileChange}
           />
-        </label>
+          <p>
+            {imageSelected
+              ? "Click on the image to change it"
+              : "Select an image"}
+          </p>
+        </div>
       </div>
       <p>หรือเลือกรูปภาพจากคลังรูปภาพ</p>
-    </div>
+
+      {predictResult && (
+        <>
+          {imageSelected && (
+            // Show the selected image if available
+            <img
+              src={imageSelected}
+              alt="Selected"
+              style={{
+                width: "50%",
+                aspectRatio: 16 / 9,
+                objectFit: "contain",
+              }}
+            />
+          )}
+          <h1>ประเภทของขยะ</h1>
+          <img src={predictResult.imageUrl} />
+          <h3>{predictResult.title}</h3>
+          <p>{predictResult.description}</p>
+        </>
+      )}
+    </>
   );
 };
 
