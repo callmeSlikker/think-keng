@@ -22,22 +22,22 @@ const CameraAndFilePicker = () => {
     general: {
       imageUrl: "/bin/1.1.png",
       title: "general",
-      description: "general",
+      description: "description general",
     },
     foodwaste: {
       imageUrl: "/bin/2.1.png",
       title: "foodwaste",
-      description: "foodwaste",
+      description: "description foodwaste",
     },
     recycle: {
       imageUrl: "/bin/3.1.png",
       title: "recycle",
-      description: "recycle",
+      description: "description recycle",
     },
     hazardous: {
       imageUrl: "/bin/4.1.png",
       title: "hazardous",
-      description: "hazardous",
+      description: "description hazardous",
     },
   };
 
