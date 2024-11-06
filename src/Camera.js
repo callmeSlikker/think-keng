@@ -49,18 +49,14 @@ const CameraAndFilePicker = () => {
       // Wait for the image to load before passing it to the model
       img.onload = async () => {
         try {
-          setLoading(true); // Show loading screen
           const prediction = await model.predict(img);
 
           // Get the highest probability prediction
           const highestPrediction = prediction.reduce((prev, current) => {
             return current.probability > prev.probability ? current : prev;
           });
-
-          setLoading(false); // Hide loading screen
           resolve(highestPrediction); // Resolve with the prediction
         } catch (error) {
-          setLoading(false); // Hide loading screen on error
           reject(error); // Reject the promise on error
         }
       };
@@ -74,24 +70,34 @@ const CameraAndFilePicker = () => {
   };
 
   const handleTakePhoto = async (dataUri) => {
+    setLoading(true);
     try {
       const prediction = await predictImage(dataUri);
       setPredictResult(details[prediction.className]);
       setImageSelected(dataUri);
     } catch (error) {
       console.error("Prediction failed:", error);
+    } finally {
+      setLoading(false)
     }
   };
 
   const handleFileChange = (event) => {
+    setLoading(true)
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = async (e) => {
-        const imageUri = e.target.result; // นี่คือ Data URI ของรูปภาพ
-        const prediction = await predictImage(imageUri);
-        setPredictResult(details[prediction.className]);
-        setImageSelected(imageUri);
+        try {
+          const imageUri = e.target.result; // นี่คือ Data URI ของรูปภาพ
+          const prediction = await predictImage(imageUri);
+          setPredictResult(details[prediction.className]);
+          setImageSelected(imageUri);
+        } catch (error) {
+          console.error("Prediction failed:", error);
+        } finally {
+          setLoading(false)
+        }
       };
       reader.readAsDataURL(file); // อ่านไฟล์เป็น Data URI
     }
@@ -99,7 +105,7 @@ const CameraAndFilePicker = () => {
 
   return (
     <>
-      {loading && <LoadingScreen />}
+      {loading && <LoadingScreen text="AI is processing . . ." />}
       <div>
         <Camera
           onTakePhoto={(dataUri) => handleTakePhoto(dataUri)} // เมื่อถ่ายภาพจะส่ง URI
