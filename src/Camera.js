@@ -22,22 +22,22 @@ const CameraAndFilePicker = () => {
     general: {
       imageUrl: "/bin/1.1.png",
       title: "general",
-      description: "ขยะทั่วไป",
+      description: ["ขยะทั่วไป", "คือ ขยะที่ย่อยสลายยากและ ไม่คุ้มค่าในการนำไปรีไซเคิล ยกตัวอย่างเช่น ถุงพลาสติกบางประเภท เปลือกลูกอม ถุงขนม เป็นต้น"],
     },
     foodwaste: {
       imageUrl: "/bin/2.1.png",
       title: "foodwaste",
-      description: "ขยะเปียก",
+      description: ["ขยะเปียก", "คือ ขยะที่ย่อยสลายได้ง่าย สามารถนำมาทำเป็นปุ๋ยได้ ตัวอย่างเช่น เศษอาหาร เศษไม้ มูลสัตว์ และซากสัตว์ เป็นต้น"],
     },
     recycle: {
       imageUrl: "/bin/3.1.png",
       title: "recycle",
-      description: "ขยะรีไซเคิล",
+      description: ["ขยะรีไซเคิล", "คือ ขยะที่สามมารถนำมาผ่านกระบวนการรีไซเคิล ทำให้สามารถนำมาใช้ใหม่ได้โดยมีคุณภาพเท่าเทียม หรือใกล้เคียงของเดิมที่สุด"],
     },
     hazardous: {
       imageUrl: "/bin/4.1.png",
       title: "hazardous",
-      description: "ขยะอันตราย",
+      description: ["ขยะอันตราย", "คือ ขยะที่ปนเปื้อนสารกำมันตรังสียกตัวอย่างเช่น อาจจะเป็นภาชนะบรรจุสารเคมี ยาที่หมดอายุแล้ว ขยะติดเชื้อจากโรงบาล วัตถุไวไฟ แบตเตอรี่"],
     },
   };
 
@@ -106,7 +106,7 @@ const CameraAndFilePicker = () => {
   return (
     <>
       {loading && <LoadingScreen text="AI is processing . . ." />}
-      <div>
+      <div style={{ transform: "scaleX(-1)" }}>
         <Camera
           onTakePhoto={(dataUri) => handleTakePhoto(dataUri)} // เมื่อถ่ายภาพจะส่ง URI
         />
@@ -155,7 +155,9 @@ const CameraAndFilePicker = () => {
           <h3>ประเภทของขยะ</h3>
           <img src={predictResult.imageUrl} />
           <h3>{predictResult.title}</h3>
-          <p>{predictResult.description}</p>
+          <div style={{padding: "5%", wordBreak: "break-word"}}>
+          {predictResult.description.map(description => <p>{description}</p>)}
+          </div>
         </>
       )}
     </>

@@ -4,7 +4,7 @@ function FirstPage() {
   return (
     <div>
       <h3>
-        หน้าหลัก
+        แยกประเภทของขยะ
       </h3>
       <CameraAndFilePicker />
     </div>
