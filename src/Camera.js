@@ -22,22 +22,22 @@ const CameraAndFilePicker = () => {
     general: {
       imageUrl: "/bin/1.1.png",
       title: "general",
-      description: "ขยะทั่วไป คือ ขยะที่ย่อยสลายยาก และไม่คุ้มค่าในการน้าไปรีไซเคิล ยกตัวอย่างเช่น ถุงพลาสติบางประเภท เปลือกลูกอม ถุงขนม เป็นต้น",
+      description: "general",
     },
     foodwaste: {
       imageUrl: "/bin/2.1.png",
       title: "foodwaste",
-      description: "description foodwaste",
+      description: "foodwaste",
     },
     recycle: {
       imageUrl: "/bin/3.1.png",
       title: "recycle",
-      description: "description recycle",
+      description: "recycle",
     },
     hazardous: {
       imageUrl: "/bin/4.1.png",
       title: "hazardous",
-      description: "description hazardous",
+      description: "hazardous",
     },
   };
 
