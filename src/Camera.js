@@ -22,22 +22,22 @@ const CameraAndFilePicker = () => {
     general: {
       imageUrl: "/bin/1.1.png",
       title: "general",
-      description: "general",
+      description: "ขยะทั่วไป",
     },
     foodwaste: {
       imageUrl: "/bin/2.1.png",
       title: "foodwaste",
-      description: "foodwaste",
+      description: "ขยะเปียก",
     },
     recycle: {
       imageUrl: "/bin/3.1.png",
       title: "recycle",
-      description: "recycle",
+      description: "ขยะรีไซเคิล",
     },
     hazardous: {
       imageUrl: "/bin/4.1.png",
       title: "hazardous",
-      description: "hazardous",
+      description: "ขยะอันตราย",
     },
   };
 
@@ -132,12 +132,11 @@ const CameraAndFilePicker = () => {
           />
           <p>
             {imageSelected
-              ? "Click on the image to change it"
+              ? "หรือเลือกรูปภาพจากคลังรูปภาพ"
               : "Select an image"}
           </p>
         </div>
       </div>
-      <p>หรือเลือกรูปภาพจากคลังรูปภาพ</p>
 
       {predictResult && (
         <>
@@ -147,13 +146,13 @@ const CameraAndFilePicker = () => {
               src={imageSelected}
               alt="Selected"
               style={{
-                width: "50%",
+                width: "85%",
                 aspectRatio: 16 / 9,
                 objectFit: "contain",
               }}
             />
           )}
-          <h1>ประเภทของขยะ</h1>
+          <h3>ประเภทของขยะ</h3>
           <img src={predictResult.imageUrl} />
           <h3>{predictResult.title}</h3>
           <p>{predictResult.description}</p>
